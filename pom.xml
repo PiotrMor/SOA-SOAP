@@ -36,6 +36,7 @@
         <module>soap-api</module>
         <module>lab-web</module>
         <module>lab-ear</module>
+        <module>soap-connector</module>
     </modules>
 
     <properties>
