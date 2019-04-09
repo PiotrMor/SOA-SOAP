@@ -28,7 +28,7 @@
     <artifactId>soap-connector</artifactId>
     <packaging>ejb</packaging>
 
-    <name>lab: Soap connector</name>
+    <name>lab: EJB Module</name>
 
     <url>http://wildfly.org</url>
     <licenses>
@@ -41,7 +41,7 @@
 
     <dependencies>
 
-        <!-- Declare the APIs we depend on and need for compilation. All of
+        <!-- Declare the APIs we depend on and need for compilation. All of 
             them are provided by JBoss WildFly -->
 
         <!-- Import the EJB API, we use provided scope as the API is included in JBoss WildFly -->
@@ -83,18 +83,18 @@
         </dependency>
 
         <!-- Optional, but highly recommended -->
-        <!-- Arquillian allows you to test enterprise code such as EJBs and
+        <!-- Arquillian allows you to test enterprise code such as EJBs and 
             Transactional(JTA) JPA from JUnit/TestNG -->
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
             <scope>test</scope>
         </dependency>
-
+      
         <dependency>
             <groupId>org.jboss.arquillian.protocol</groupId>
             <artifactId>arquillian-protocol-servlet</artifactId>
-            <scope>test</scope>
+            <scope>test</scope>               
         </dependency>
 
     </dependencies>
@@ -110,14 +110,22 @@
                     <ejbVersion>3.1</ejbVersion>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
     <profiles>
         <profile>
-            <!-- The default profile skips all tests, though you can tune it
+            <!-- The default profile skips all tests, though you can tune it 
                 to run just unit tests based on a custom pattern -->
-            <!-- Seperate profiles are provided for running all tests, including
+            <!-- Seperate profiles are provided for running all tests, including 
                 Arquillian tests that execute in the specified container -->
             <id>default</id>
             <activation>
@@ -137,7 +145,7 @@
         </profile>
 
         <profile>
-            <!-- An optional Arquillian testing profile that executes tests
+            <!-- An optional Arquillian testing profile that executes tests 
                 in your WildFly instance -->
             <!-- This profile will start a new WildFly instance, and execute
                 the test, shutting it down when done -->
@@ -153,7 +161,7 @@
         </profile>
 
         <profile>
-            <!-- An optional Arquillian testing profile that executes tests
+            <!-- An optional Arquillian testing profile that executes tests 
                 in a remote WildFly instance -->
             <!-- Run with: mvn clean test -Parq-wildfly-remote -->
             <id>arq-wildfly-remote</id>

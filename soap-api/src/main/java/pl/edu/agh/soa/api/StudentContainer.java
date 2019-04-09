@@ -7,6 +7,20 @@ import java.util.List;
 
 @Singleton
 public class StudentContainer {
-    //List<Student> students = new ArrayList<>();
 
+    private List<Student> students;
+
+    @PostConstruct
+    public void init() {
+        students = new ArrayList<>();
+    }
+
+
+    public void addStudent(Student student) {
+        students.add(student);
+    }
+
+    public List<Student> getAll() {
+        return new ArrayList<>(students);
+    }
 }

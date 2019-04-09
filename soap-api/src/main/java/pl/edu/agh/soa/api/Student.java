@@ -70,4 +70,14 @@ public class Student implements Serializable {
     }
 
 
+    @Override
+    public String toString() {
+        return "Student{" +
+                "indexNumber=" + indexNumber +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", age=" + age +
+                ", courses=" + courses +
+                '}';
+    }
 }
