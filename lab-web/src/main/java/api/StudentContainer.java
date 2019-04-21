@@ -1,4 +1,6 @@
-package pl.edu.agh.soa.api;
+package api;
+
+import model.Student;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Singleton;
@@ -15,14 +17,15 @@ public class StudentContainer {
         students = new ArrayList<>();
     }
 
-
-    public void addStudent(Student student) {
-        students.add(student);
-    }
-
     public List<Student> getAll() {
-        return new ArrayList<>(students);
+        return students;
     }
 
+    public void addStudent(Student s) {
+        students.add(s);
+    }
 
+    public boolean deleteStudent(int indexNumber) {
+        return students.removeIf(student -> student.getIndexNumber() == indexNumber);
+    }
 }
