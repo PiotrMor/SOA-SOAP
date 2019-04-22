@@ -20,6 +20,19 @@ public class StudentController {
         return Response.ok(container.getAll()).status(Response.Status.OK).build();
     }
 
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getStudentById(@PathParam("id") int indexNumber) {
+        Student student = container.getAll().stream().filter(s -> s.getIndexNumber()==indexNumber).findFirst().orElse(null);
+
+        if (student != null) {
+            return Response.ok(student).status(Response.Status.OK).build();
+        }
+
+        return Response.notModified().status(Response.Status.BAD_REQUEST).build();
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

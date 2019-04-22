@@ -37,6 +37,8 @@
         <module>lab-web</module>
         <module>lab-ear</module>
         <module>soap-connector</module>
+	<module>rest-connector</module>
+	<module>lab-model</module>
     </modules>
 
     <properties>
