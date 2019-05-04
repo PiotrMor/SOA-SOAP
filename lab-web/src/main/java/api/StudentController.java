@@ -1,7 +1,12 @@
 package api;
 
-import model.Student;
 
+
+
+
+import model.Student;
+import model.StudentContainer;
+import utils.Base64Utils;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -74,5 +79,13 @@ public class StudentController {
             return Response.ok().status(Response.Status.OK).build();
         }
         return Response.ok().status(Response.Status.BAD_REQUEST).build();
+    }
+
+    @GET
+    @Path("/avatar")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getAvatar() {
+        return Response.ok(Base64Utils.encoder("/home/piotr/SOA/Zadanie1/lab/soap-api/src/main/resources/avatar.png"))
+                .status(Response.Status.OK).build();
     }
 }

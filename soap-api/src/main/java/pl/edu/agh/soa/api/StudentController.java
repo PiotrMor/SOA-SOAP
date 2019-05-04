@@ -2,8 +2,11 @@ package pl.edu.agh.soa.api;
 
 
 
+import model.Student;
+import model.StudentContainer;
 import org.jboss.annotation.security.SecurityDomain;
 import org.jboss.ws.api.annotation.WebContext;
+import utils.Base64Utils;
 
 import javax.annotation.security.DeclareRoles;
 import javax.annotation.security.PermitAll;
@@ -33,7 +36,7 @@ public class StudentController {
     @WebMethod
     @RolesAllowed("developer")
     public Student addStudent(@WebParam(name = "indexNumber") final int indexNumber, @WebParam(name = "firstName") String firstName, @WebParam(name = "lastName") String lastName,
-                           @WebParam(name = "age") int age, @WebParam(name = "courses") List<String> courses) {
+                              @WebParam(name = "age") int age, @WebParam(name = "courses") List<String> courses) {
 
         Student newStudent = null;
         if (container.getAll().stream().noneMatch(s -> s.getIndexNumber() == indexNumber)) {

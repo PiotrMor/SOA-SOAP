@@ -1,4 +1,4 @@
-package pl.edu.agh.soa.api;
+package utils;
 
 import java.io.*;
 import java.util.Base64;

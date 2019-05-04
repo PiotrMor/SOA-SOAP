@@ -1,15 +1,19 @@
 package model;
 
+import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/*@XmlRootElement(name = "student")
+@XmlAccessorType(XmlAccessType.FIELD)*/
 public class Student implements Serializable {
     private int indexNumber;
     private String firstName;
     private String lastName;
     private int age;
+/*    @XmlElementWrapper(name = "courses")
+    @XmlElement(name = "course")*/
     private List<String> courses = new ArrayList<>();
 
     public Student() {
