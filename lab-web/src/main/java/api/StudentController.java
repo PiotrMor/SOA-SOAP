@@ -4,20 +4,32 @@ package api;
 
 
 
+import auth.JWTTokenNeeded;
+import auth.KeyGenerator;
+import io.jsonwebtoken.Jwts;
 import model.Student;
 import model.StudentContainer;
 import utils.Base64Utils;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
+import java.security.Key;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
 @Path("student")
 public class StudentController {
 
     @Inject
     StudentContainer container;
+
+    @Context
+    UriInfo uriInfo;
+
+    @Inject
+    private KeyGenerator keyGenerator;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -41,6 +53,7 @@ public class StudentController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @JWTTokenNeeded
     public Response addStudent(Student student) {
         if (container.getAll().stream().noneMatch(s -> s.getIndexNumber() == student.getIndexNumber())){
             container.addStudent(student);
@@ -52,6 +65,7 @@ public class StudentController {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @JWTTokenNeeded
     public Response editStudent(final Student student) {
         Student editStudent = container
                 .getAll()
@@ -74,6 +88,7 @@ public class StudentController {
 
     @DELETE
     @Path("/{id}")
+    @JWTTokenNeeded
     public Response deleteStudent(@PathParam("id") int indexNumber) {
         if (container.deleteStudent(indexNumber)) {
             return Response.ok().status(Response.Status.OK).build();
@@ -87,5 +102,31 @@ public class StudentController {
     public Response getAvatar() {
         return Response.ok(Base64Utils.encoder("/home/piotr/SOA/Zadanie1/lab/soap-api/src/main/resources/avatar.png"))
                 .status(Response.Status.OK).build();
+    }
+
+    @POST
+    @Path("login")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response authenticateUser(@FormParam("login") String login, @FormParam("password") String password) {
+        try {
+            String token = issueToken(login);
+
+            return Response.ok().header(HttpHeaders.AUTHORIZATION, "Bearer " + token).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+    }
+
+    private String issueToken(String login) {
+        Key key = keyGenerator.generateKey();
+        String jwtToken = Jwts.builder()
+                .setSubject(login)
+                .setIssuer(uriInfo.getAbsolutePath().toString())
+                .setIssuedAt(new Date())
+                .setExpiration(Date.from(LocalDateTime.now().plusMinutes(15L).atZone(ZoneId.systemDefault()).toInstant()))
+                .signWith(key)
+                .compact();
+        return jwtToken;
     }
 }

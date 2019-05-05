@@ -1,5 +1,5 @@
 import api.StudentController;
-import model.Student;
+import auth.JWTTokenNeededFilter;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
@@ -12,6 +12,7 @@ public class StudentApplication extends Application {
     public Set<Class<?>> getClasses() {
         HashSet<Class<?>> classes = new HashSet<>();
         classes.add(StudentController.class);
+        classes.add(JWTTokenNeededFilter.class);
         return classes;
     }
 }
