@@ -7,6 +7,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import utils.Base64Utils;
 
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -19,25 +20,28 @@ public class Consume {
 
     public static void main(String[] args) {
         List<String> courses = new ArrayList<>();
+
+        String jwtToken = login("qwe", "asd");
+
         courses.add("SOA");
         courses.add("JAVA");
 
         Student s1 = new Student(123123, "Karol", "Kowalski", 21, courses);
         courses.add("C++");
         Student s2 = new Student(213123, "Łukasz", "Polak", 22, courses);
-        System.out.println(addStudent(s1));
+        System.out.println(addStudent(s1, jwtToken));
 
-        System.out.println(addStudent(s2));
+        System.out.println(addStudent(s2, jwtToken));
 
         System.out.println(getStudentList());
 
         s1.setLastName("Nowak");
 
-        System.out.println(updateStudent(s1));
+        System.out.println(updateStudent(s1, jwtToken));
 
         System.out.println(getStudent(123123));
 
-        System.out.println(deleteStudent(123123));
+        System.out.println(deleteStudent(123123, jwtToken));
 
         System.out.println(getStudentList());
 
@@ -67,26 +71,36 @@ public class Consume {
         return students;
     }
 
-    private static int addStudent(Student student) {
+    private static int addStudent(Student student, String token) {
         ResteasyClient client = new ResteasyClientBuilder().build();
         ResteasyWebTarget target = client.target(URL);
-        Response response = target.request().post(Entity.entity(student, MediaType.APPLICATION_JSON ));
+        Response response = target
+                .request()
+                .header("Authorization", token)
+                .post(Entity.entity(student, MediaType.APPLICATION_JSON ));
         client.close();
         return response.getStatus();
     }
 
-    private static int deleteStudent(int id) {
+    private static int deleteStudent(int id, String token) {
         ResteasyClient client = new ResteasyClientBuilder().build();
         ResteasyWebTarget target = client.target(URL);
-        Response response = target.path(id + "").request().delete();
+        Response response = target
+                .path(id + "")
+                .request()
+                .header("Authorization", token)
+                .delete();
         client.close();
         return response.getStatus();
     }
 
-    private static int updateStudent(Student student) {
+    private static int updateStudent(Student student, String token) {
         ResteasyClient client = new ResteasyClientBuilder().build();
         ResteasyWebTarget target = client.target(URL);
-        Response response = target.request().put(Entity.entity(student, MediaType.APPLICATION_JSON ));
+        Response response = target
+                .request()
+                .header("Authorization", token)
+                .put(Entity.entity(student, MediaType.APPLICATION_JSON ));
         client.close();
         return response.getStatus();
     }
@@ -103,5 +117,21 @@ public class Consume {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static String login(String login, String password) {
+        ResteasyClient client = new ResteasyClientBuilder().build();
+        ResteasyWebTarget target = client.target((URL));
+
+        Form form = new Form();
+        form.param("login", login).param("password", password);
+
+        Response response = target
+                .path("login")
+                .request()
+                .post(Entity.form(form));
+        client.close();
+
+        return response.getHeaderString("Authorization");
     }
 }
