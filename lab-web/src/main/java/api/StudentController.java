@@ -7,6 +7,9 @@ package api;
 import auth.JWTTokenNeeded;
 import auth.KeyGenerator;
 import io.jsonwebtoken.Jwts;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import model.Student;
 import model.StudentContainer;
 import utils.Base64Utils;
@@ -20,6 +23,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 @Path("student")
+@Api(value = "student")
 public class StudentController {
 
     @Inject
@@ -32,6 +36,7 @@ public class StudentController {
     private KeyGenerator keyGenerator;
 
     @GET
+    @ApiOperation(value = "List students")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getStudentList() {
         return Response.ok(container.getAll()).status(Response.Status.OK).build();
@@ -39,6 +44,7 @@ public class StudentController {
 
     @GET
     @Path("/{id}")
+    @ApiOperation(value = "Get student by id")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getStudentById(@PathParam("id") int indexNumber) {
         Student student = container.getAll().stream().filter(s -> s.getIndexNumber()==indexNumber).findFirst().orElse(null);
@@ -51,6 +57,7 @@ public class StudentController {
     }
 
     @POST
+    @ApiOperation(value = "Add new student")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @JWTTokenNeeded
@@ -63,6 +70,7 @@ public class StudentController {
     }
 
     @PUT
+    @ApiOperation(value = "Update student")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @JWTTokenNeeded
@@ -87,6 +95,7 @@ public class StudentController {
     }
 
     @DELETE
+    @ApiOperation(value = "Remove student")
     @Path("/{id}")
     @JWTTokenNeeded
     public Response deleteStudent(@PathParam("id") int indexNumber) {
@@ -97,6 +106,7 @@ public class StudentController {
     }
 
     @GET
+    @ApiOperation(value = "Returns avatar in Base64")
     @Path("/avatar")
     @Produces(MediaType.TEXT_PLAIN)
     public Response getAvatar() {
@@ -105,6 +115,7 @@ public class StudentController {
     }
 
     @POST
+    @ApiOperation(value = "Login to get token")
     @Path("login")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response authenticateUser(@FormParam("login") String login, @FormParam("password") String password) {
