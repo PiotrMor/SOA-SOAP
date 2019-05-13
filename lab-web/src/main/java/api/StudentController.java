@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import model.Student;
 import model.StudentContainer;
+import model.StudentProto;
 import utils.Base64Utils;
 
 import javax.inject.Inject;
@@ -20,7 +21,9 @@ import javax.ws.rs.core.*;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Path("student")
 @Api(value = "student")
@@ -139,5 +142,25 @@ public class StudentController {
                 .signWith(key)
                 .compact();
         return jwtToken;
+    }
+
+    @GET
+    @Path("/proto")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getProtoStudent() {
+        StudentProto.Student.Builder builder = StudentProto.Student.newBuilder();
+
+        List<String> courses = new ArrayList<>();
+        courses.add("SOA");
+        courses.add("JAVA");
+        builder.addAllCourses(courses);
+        builder
+                .setAge(21)
+                .setFirstName("Rafał")
+                .setLastName("Stępień")
+                .setId(312521);
+        StudentProto.Student student = builder.build();
+
+        return Response.ok(student.toByteArray(), MediaType.APPLICATION_OCTET_STREAM).build();
     }
 }
