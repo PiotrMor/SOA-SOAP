@@ -113,6 +113,12 @@
             <version>4.2.2.GA</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.6.1</version>
+        </dependency>
     </dependencies>
 
     <build>

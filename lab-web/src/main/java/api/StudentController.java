@@ -67,7 +67,7 @@ public class StudentController {
     public Response addStudent(Student student) {
         if (container.getAll().stream().noneMatch(s -> s.getIndexNumber() == student.getIndexNumber())){
             container.addStudent(student);
-            return Response.ok(student).status(Response.Status.OK).build();
+            return Response.ok(student).status(Response.Status.CREATED).build();
         }
         return Response.notModified().status(Response.Status.BAD_REQUEST).build();
     }
@@ -156,8 +156,8 @@ public class StudentController {
         builder.addAllCourses(courses);
         builder
                 .setAge(21)
-                .setFirstName("Rafał")
-                .setLastName("Stępień")
+                .setFirstName("Rafal")
+                .setLastName("Stepien")
                 .setId(312521);
         StudentProto.Student student = builder.build();
 

@@ -1,17 +1,23 @@
 package consume;
 
 import model.Student;
+import model.StudentProto;
+import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import utils.Base64Utils;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +35,8 @@ public class Consume {
         Student s1 = new Student(123123, "Karol", "Kowalski", 21, courses);
         courses.add("C++");
         Student s2 = new Student(213123, "Łukasz", "Polak", 22, courses);
+
+
         System.out.println(addStudent(s1, jwtToken));
 
         System.out.println(addStudent(s2, jwtToken));
@@ -46,6 +54,8 @@ public class Consume {
         System.out.println(getStudentList());
 
         getAvatar();
+
+        System.out.println("\n Proto student: " + getProto());
     }
 
     private static Student getStudent(int id) {
@@ -106,8 +116,8 @@ public class Consume {
     }
 
     private static void getAvatar() {
-        ResteasyClient client = new ResteasyClientBuilder().build();
-        ResteasyWebTarget target = client.target(URL);
+        Client client = new ResteasyClientBuilder().build();
+        WebTarget target = client.target(URL);
         Response response = target.path("avatar").request().get();
         String codedAvatar = response.readEntity(String.class);
         client.close();
@@ -121,11 +131,10 @@ public class Consume {
 
     private static String login(String login, String password) {
         ResteasyClient client = new ResteasyClientBuilder().build();
-        ResteasyWebTarget target = client.target((URL));
+        ResteasyWebTarget target = client.target(URL);
 
         Form form = new Form();
         form.param("login", login).param("password", password);
-
         Response response = target
                 .path("login")
                 .request()
@@ -133,5 +142,24 @@ public class Consume {
         client.close();
 
         return response.getHeaderString("Authorization");
+    }
+
+    private static String getProto() {
+        ResteasyClient client = new ResteasyClientBuilder().build();
+        ResteasyWebTarget target = client.target(URL);
+
+        InputStream response = target
+                .path("proto")
+                .request()
+                .header("accept", MediaType.APPLICATION_OCTET_STREAM)
+                .get(InputStream.class);
+
+        try {
+            StudentProto.Student student = StudentProto.Student.parseFrom(IOUtils.toByteArray(response));
+            return student.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Error";
     }
 }
