@@ -1,25 +1,43 @@
-package model;
-
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-
-public class Student implements Serializable {
+@Entity
+@Table(name="student")
+public class StudentRepository implements Serializable {
+    @Id
+    @Column(name = "studentId")
     private int indexNumber;
-    private String firstName;
-    private String lastName;
-    private Address address;
-    private List<Course> courses;
 
-    public Student() {
+    @Column(name = "firstName")
+    private String firstName;
+
+    @Column(name = "lastName")
+    private String lastName;
+
+    @Embedded
+    private AddressRepository address;
+
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "courses",
+            joinColumns = {@JoinColumn(name = "studentId")},
+            inverseJoinColumns = {@JoinColumn(name = "course_id")}
+    )
+    private Set<CourseRepository> courses = new HashSet<>();
+
+
+    public StudentRepository() {
+        super();
     }
 
-    public Student(int indexNumber, String firstName, String lastName, Address address, List<Course> courses) {
-        this.indexNumber = indexNumber;
+    public StudentRepository(String firstName, String lastName, AddressRepository address) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
-        this.courses = courses;
     }
 
     public int getIndexNumber() {
@@ -46,30 +64,29 @@ public class Student implements Serializable {
         this.lastName = lastName;
     }
 
-    public Address getAddress() {
+    public AddressRepository getAddress() {
         return address;
     }
 
-    public void setAddress(Address address) {
+    public void setAddress(AddressRepository address) {
         this.address = address;
     }
 
-    public List<Course> getCourses() {
+    public Set<CourseRepository> getCourses() {
         return courses;
     }
 
-    public void setCourses(List<Course> courses) {
+    public void setCourses(Set<CourseRepository> courses) {
         this.courses = courses;
     }
 
     @Override
     public String toString() {
-        return "Student{" +
-                "indexNumber=" + indexNumber +
+        return "StudentRepository{" +
+                "id=" + indexNumber +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", address=" + address +
-                ", courses=" + courses +
                 '}';
     }
 }

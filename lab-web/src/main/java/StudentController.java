@@ -1,21 +1,17 @@
-package api;
-
-
-
-
-
 import auth.JWTTokenNeeded;
 import auth.KeyGenerator;
 import io.jsonwebtoken.Jwts;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
+import model.Avatar;
 import model.Student;
 import model.StudentContainer;
 import model.StudentProto;
 import utils.Base64Utils;
-
+import javax.ejb.EJB;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.security.Key;
@@ -24,13 +20,20 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Path("student")
 @Api(value = "student")
 public class StudentController {
 
-    @Inject
-    StudentContainer container;
+    Logger logger = Logger.getLogger(this.getClass().getName());
+
+    @EJB
+    StudentDao studentDao;
+
+    @EJB
+    AvatarDao avatarDao;
+
 
     @Context
     UriInfo uriInfo;
@@ -42,7 +45,20 @@ public class StudentController {
     @ApiOperation(value = "List students")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getStudentList() {
-        return Response.ok(container.getAll()).status(Response.Status.OK).build();
+        List<Student> students = studentDao.getAll();
+        return Response.ok(students).status(Response.Status.OK).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getStudentList(@QueryParam("lastName") String lastNameFilter) {
+        List<Student> students;
+        if (lastNameFilter == null) {
+            students = studentDao.getAll();
+        } else {
+            students = studentDao.getAllByLastName(lastNameFilter);
+        }
+        return Response.ok(students).status(Response.Status.OK).build();
     }
 
     @GET
@@ -50,59 +66,45 @@ public class StudentController {
     @ApiOperation(value = "Get student by id")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getStudentById(@PathParam("id") int indexNumber) {
-        Student student = container.getAll().stream().filter(s -> s.getIndexNumber()==indexNumber).findFirst().orElse(null);
+        Student student = studentDao.getOne(indexNumber);
 
         if (student != null) {
             return Response.ok(student).status(Response.Status.OK).build();
         }
 
-        return Response.notModified().status(Response.Status.BAD_REQUEST).build();
+        return Response.status(Response.Status.NOT_FOUND).build();
     }
 
     @POST
     @ApiOperation(value = "Add new student")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @JWTTokenNeeded
+    //@JWTTokenNeeded
     public Response addStudent(Student student) {
-        if (container.getAll().stream().noneMatch(s -> s.getIndexNumber() == student.getIndexNumber())){
-            container.addStudent(student);
-            return Response.ok(student).status(Response.Status.CREATED).build();
+        if (studentDao.getAll().stream().noneMatch(s -> s.getIndexNumber() == student.getIndexNumber())) {
+            studentDao.add(student);
+            return Response.ok(student).status(Response.Status.OK).build();
+        } else {
+            return Response.notModified().status(Response.Status.BAD_REQUEST).build();
         }
-        return Response.notModified().status(Response.Status.BAD_REQUEST).build();
     }
 
     @PUT
+    @Path("/{id}")
     @ApiOperation(value = "Update student")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @JWTTokenNeeded
-    public Response editStudent(final Student student) {
-        Student editStudent = container
-                .getAll()
-                .stream()
-                .filter(s -> s.getIndexNumber() == student.getIndexNumber())
-                .findFirst()
-                .orElse(null);
-
-        if (editStudent == null) {
-            return Response.notModified().status(Response.Status.BAD_REQUEST).build();
-        }
-
-        editStudent.setAge(student.getAge());
-        editStudent.setFirstName(student.getFirstName());
-        editStudent.setLastName(student.getLastName());
-        editStudent.setCourses(student.getCourses());
-
-        return Response.ok(editStudent).status(Response.Status.OK).build();
+    //@JWTTokenNeeded
+    public Response editStudent(@PathParam("id") int indexNumber, @Valid Student student) {
+        return Response.ok().status(Response.Status.OK).entity(studentDao.update(indexNumber, student)).build();
     }
 
     @DELETE
     @ApiOperation(value = "Remove student")
     @Path("/{id}")
-    @JWTTokenNeeded
+    //@JWTTokenNeeded
     public Response deleteStudent(@PathParam("id") int indexNumber) {
-        if (container.deleteStudent(indexNumber)) {
+        if (studentDao.deleteStudent(indexNumber)) {
             return Response.ok().status(Response.Status.OK).build();
         }
         return Response.ok().status(Response.Status.BAD_REQUEST).build();
@@ -112,9 +114,20 @@ public class StudentController {
     @ApiOperation(value = "Returns avatar in Base64")
     @Path("/avatar")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response getAvatar() {
-        return Response.ok(Base64Utils.encoder("/home/piotr/SOA/Zadanie1/lab/soap-api/src/main/resources/avatar.png"))
-                .status(Response.Status.OK).build();
+    public Response getAvatar(int indexNumber) {
+        return Response.status(Response.Status.OK).entity(avatarDao.getAvatar(indexNumber)).build();
+    }
+
+    @POST
+    @Path("/avatar")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addAvatar(int indexNumber) {
+        Avatar avatar =
+                new Avatar(Base64Utils.encoder("/home/piotr/SOA/Zadanie1/lab/soap-api/src/main/resources/avatar.png"),
+                        indexNumber);
+        avatarDao.addAvatar(avatar);
+        return Response.status(Response.Status.OK).entity(avatar).build();
     }
 
     @POST
@@ -144,7 +157,7 @@ public class StudentController {
         return jwtToken;
     }
 
-    @GET
+/*    @GET
     @Path("/proto")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getProtoStudent() {
@@ -158,9 +171,9 @@ public class StudentController {
                 .setAge(21)
                 .setFirstName("Rafal")
                 .setLastName("Stepien")
-                .setId(312521);
+                .setIndexNumber(312521);
         StudentProto.Student student = builder.build();
 
         return Response.ok(student.toByteArray(), MediaType.APPLICATION_OCTET_STREAM).build();
-    }
+    }*/
 }

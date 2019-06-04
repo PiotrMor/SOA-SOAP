@@ -1,7 +1,6 @@
 package consume;
 
-import model.Student;
-import model.StudentProto;
+import model.*;
 import org.apache.commons.io.IOUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -25,25 +24,45 @@ public class Consume {
     private static final String URL = "http://localhost:8080/lab-web/student";
 
     public static void main(String[] args) {
-        List<String> courses = new ArrayList<>();
-
+        List<Course> courses = new ArrayList<>();
+        courses.add(new Course("soa", 4, new Lecturer("Kowalski")));
         String jwtToken = login("qwe", "asd");
+        courses.add(new Course("java",3, new Lecturer("Nowak")));
 
-        courses.add("SOA");
-        courses.add("JAVA");
+        Address address = new Address("Budryka", "Krakow");
 
-        Student s1 = new Student(123123, "Karol", "Kowalski", 21, courses);
-        courses.add("C++");
-        Student s2 = new Student(213123, "Łukasz", "Polak", 22, courses);
+        Student s1 = new Student(123123, "Karol", "Kowalski",address, courses);
+        Student s2 = new Student(213123, "Łukasz", "Polak",address, courses);
+        Student s3 = new Student(223123, "Łukasz", "Polak",address, courses);
+
+        deleteStudent(123123, jwtToken);
+        deleteStudent(213123, jwtToken);
+        deleteStudent(223123, jwtToken);
 
 
         System.out.println(addStudent(s1, jwtToken));
 
         System.out.println(addStudent(s2, jwtToken));
+        System.out.println(addStudent(s3, jwtToken));
 
+        System.out.println("-----STUDENTS WITH LASTNAME = Polak-----");
+        System.out.println(getStudentList("Polak"));
+        System.out.println("-----ALL STUDENTS-----");
         System.out.println(getStudentList());
 
-        s1.setLastName("Nowak");
+        deleteStudent(123123, jwtToken);
+        System.out.println("-----ONE STUDENT DELETED-----");
+        System.out.println(getStudentList());
+
+        s2.setFirstName("Kacper");
+
+        updateStudent(s2, jwtToken);
+        System.out.println("-----UPDATE STUDENT WITH ID 213123");
+        System.out.println(getStudent(s2.getIndexNumber()));
+
+
+
+        /*s1.setLastName("Nowak");
 
         System.out.println(updateStudent(s1, jwtToken));
 
@@ -51,11 +70,10 @@ public class Consume {
 
         System.out.println(deleteStudent(123123, jwtToken));
 
-        System.out.println(getStudentList());
+        System.out.println(getStudentList());*/
 
-        getAvatar();
 
-        System.out.println("\n Proto student: " + getProto());
+
     }
 
     private static Student getStudent(int id) {
@@ -69,6 +87,18 @@ public class Consume {
         }
         client.close();
         return student;
+    }
+
+    private static List<Student> getStudentList(String lastName) {
+        ResteasyClient client = new ResteasyClientBuilder().build();
+        ResteasyWebTarget target = client.target(URL);
+        Response response = target
+                .queryParam("lastName", lastName)
+                .request()
+                .get();
+        List<Student> students = response.readEntity(new GenericType<List<Student>>() {});
+        client.close();
+        return students;
     }
 
 
@@ -108,6 +138,7 @@ public class Consume {
         ResteasyClient client = new ResteasyClientBuilder().build();
         ResteasyWebTarget target = client.target(URL);
         Response response = target
+                .path(student.getIndexNumber() + "")
                 .request()
                 .header("Authorization", token)
                 .put(Entity.entity(student, MediaType.APPLICATION_JSON ));

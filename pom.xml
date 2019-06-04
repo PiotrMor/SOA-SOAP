@@ -37,8 +37,10 @@
         <module>lab-web</module>
         <module>lab-ear</module>
         <module>soap-connector</module>
-	<module>rest-connector</module>
-	<module>lab-model</module>
+        <module>lab-jpa</module>
+        <module>lab-dao</module>
+        <module>rest-connector</module>
+        <module>lab-model</module>
     </modules>
 
     <properties>
@@ -80,6 +82,27 @@
                 <version>${project.version}</version>
                 <type>ejb</type>
             </dependency>
+
+            <dependency>
+                <groupId>pl.edu.agh.soa</groupId>
+                <artifactId>lab-dao</artifactId>
+                <version>${project.version}</version>
+                <type>ejb</type>
+            </dependency>
+
+            <dependency>
+                <groupId>pl.edu.agh.soa</groupId>
+                <artifactId>lab-jpa</artifactId>
+                <version>${project.version}</version>
+                <type>ejb</type>
+            </dependency>
+
+            <dependency>
+                <groupId>pl.edu.agh.soa</groupId>
+                <artifactId>lab-model</artifactId>
+                <version>${project.version}</version>
+                <type>ejb</type>
+            </dependency>
             
             <!-- Define the version of the WAR so that we don't need to repeat 
                 ourselves in every module -->
@@ -90,6 +113,7 @@
                 <type>war</type>
                 <scope>compile</scope>
             </dependency>
+
 
             <!-- JBoss distributes a complete set of Java EE 7 APIs including
                 a Bill of Materials (BOM). A BOM specifies the versions of a "stack" (or 
@@ -113,7 +137,9 @@
                 <version>${version.jboss.bom}</version>
                 <type>pom</type>
                 <scope>import</scope>
+
             </dependency>
+
 
         </dependencies>
     </dependencyManagement>

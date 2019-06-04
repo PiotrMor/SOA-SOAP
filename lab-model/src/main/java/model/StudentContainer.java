@@ -1,7 +1,5 @@
 package model;
 
-import model.Student;
-
 import javax.annotation.PostConstruct;
 import javax.inject.Singleton;
 import java.util.ArrayList;

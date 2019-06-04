@@ -1,4 +1,3 @@
-import api.StudentController;
 import auth.JWTTokenNeededFilter;
 import io.swagger.jaxrs.config.BeanConfig;
 
@@ -11,7 +10,7 @@ import java.util.Set;
 public class StudentApplication extends Application {
 
     public StudentApplication() {
-        init();
+        //init();
     }
 
     @Override
