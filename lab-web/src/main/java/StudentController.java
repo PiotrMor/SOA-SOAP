@@ -42,24 +42,23 @@ public class StudentController {
     private KeyGenerator keyGenerator;
 
     @GET
-    @ApiOperation(value = "List students")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getStudentList() {
-        List<Student> students = studentDao.getAll();
-        return Response.ok(students).status(Response.Status.OK).build();
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getStudentList(@QueryParam("lastName") String lastNameFilter) {
+    public Response getStudentList(@QueryParam("lastName") String lastNameFilter,
+                                   @QueryParam("courseName") String courseNameFilter) {
         List<Student> students;
-        if (lastNameFilter == null) {
-            students = studentDao.getAll();
-        } else {
+        if (courseNameFilter != null) {
+            System.out.println("courseFilter");
+            students = studentDao.getAllByCourseName(courseNameFilter);
+        } else if (lastNameFilter != null) {
+            System.out.println("lastNameFilter");
             students = studentDao.getAllByLastName(lastNameFilter);
+        } else {
+            System.out.println("all");
+            students = studentDao.getAll();
         }
         return Response.ok(students).status(Response.Status.OK).build();
     }
+
 
     @GET
     @Path("/{id}")

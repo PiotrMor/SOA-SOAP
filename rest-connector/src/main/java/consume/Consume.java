@@ -43,10 +43,13 @@ public class Consume {
         System.out.println(addStudent(s1, jwtToken));
 
         System.out.println(addStudent(s2, jwtToken));
+        courses.add(new Course("c++", 5, new Lecturer("Fatyga")));
         System.out.println(addStudent(s3, jwtToken));
 
+        System.out.println("-----STUDENTS WITH COURSE c++-----");
+        System.out.println(getStudentList("courseName", "c++"));
         System.out.println("-----STUDENTS WITH LASTNAME = Polak-----");
-        System.out.println(getStudentList("Polak"));
+        System.out.println(getStudentList("lastName","Polak"));
         System.out.println("-----ALL STUDENTS-----");
         System.out.println(getStudentList());
 
@@ -89,11 +92,11 @@ public class Consume {
         return student;
     }
 
-    private static List<Student> getStudentList(String lastName) {
+    private static List<Student> getStudentList(String query, String value) {
         ResteasyClient client = new ResteasyClientBuilder().build();
         ResteasyWebTarget target = client.target(URL);
         Response response = target
-                .queryParam("lastName", lastName)
+                .queryParam(query, value)
                 .request()
                 .get();
         List<Student> students = response.readEntity(new GenericType<List<Student>>() {});

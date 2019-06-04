@@ -12,6 +12,10 @@ public class AvatarRepository implements Serializable {
     @Lob
     private String avatar;
 
+    @OneToOne()
+    @MapsId
+    private StudentRepository student;
+
     public Integer getId() {
         return id;
     }

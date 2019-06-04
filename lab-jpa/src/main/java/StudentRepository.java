@@ -21,6 +21,9 @@ public class StudentRepository implements Serializable {
     @Embedded
     private AddressRepository address;
 
+    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
+    private AvatarRepository avatar;
+
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(
             name = "courses",

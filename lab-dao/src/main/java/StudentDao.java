@@ -90,12 +90,24 @@ public class StudentDao extends AbstractDao{
         return sm.EntitytoDTO(results);
     }
 
-    public List<Student> getAllByCourseName(String CourseName) {
+    public List<Student> getAllByCourseName(String courseName) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         CriteriaQuery<StudentRepository> q = cb.createQuery(StudentRepository.class);
         Root<StudentRepository> c = q.from(StudentRepository.class);
-        Join<StudentRepository, CourseRepository> course = c.join()
+        ParameterExpression<String> p = cb.parameter(String.class);
+        Join<StudentRepository, CourseRepository> course = c.join("courses", JoinType.LEFT);
+
+        Predicate predicate = cb.equal(course.get("name"), p);
+
+        q.select(c).distinct(true).where(predicate);
+
+        TypedQuery<StudentRepository> query = entityManager.createQuery(q);
+        query.setParameter(p, courseName);
+
+        List<StudentRepository> results = query.getResultList();
+
+        StudentMapper sm = new StudentMapper();
 
         return sm.EntitytoDTO(results);
     }
