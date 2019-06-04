@@ -1,12 +1,10 @@
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity(name = "course")
 @Table(name = "course")
-public class CourseRepository {
+public class CourseJPA {
 
     @Id
     @Column(name = "id")
@@ -21,16 +19,16 @@ public class CourseRepository {
 
 
     @ManyToMany(mappedBy = "courses")
-    private Set<StudentRepository> students = new HashSet<>();
+    private Set<StudentJPA> students = new HashSet<>();
 
     @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     @JoinColumn(name = "lecturer_id")
-    private LecturerRepository lecturer;
+    private LecturerJPA lecturer;
 
-    public CourseRepository() {
+    public CourseJPA() {
     }
 
-    public CourseRepository(String name, int ects) {
+    public CourseJPA(String name, int ects) {
         this.name = name;
         this.ects = ects;
     }
@@ -51,11 +49,11 @@ public class CourseRepository {
         this.ects = ects;
     }
 
-    public Set<StudentRepository> getStudents() {
+    public Set<StudentJPA> getStudents() {
         return students;
     }
 
-    public void setStudents(Set<StudentRepository> students) {
+    public void setStudents(Set<StudentJPA> students) {
         this.students = students;
     }
 
@@ -67,11 +65,11 @@ public class CourseRepository {
         this.projectId = projectId;
     }
 
-    public LecturerRepository getLecturer() {
+    public LecturerJPA getLecturer() {
         return lecturer;
     }
 
-    public void setLecturer(LecturerRepository lecturer) {
+    public void setLecturer(LecturerJPA lecturer) {
         this.lecturer = lecturer;
     }
 

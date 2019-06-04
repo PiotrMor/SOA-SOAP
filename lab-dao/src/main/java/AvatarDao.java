@@ -12,14 +12,14 @@ public class AvatarDao extends AbstractDao {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Class<AvatarRepository> getType() {
-        return AvatarRepository.class;
+    protected Class<AvatarJPA> getType() {
+        return AvatarJPA.class;
     }
 
     public Avatar getAvatar(Integer id) {
         StudentMapper sm = new StudentMapper();
 
-        AvatarRepository avatarRepository = this.entityManager.find(AvatarRepository.class, id);
+        AvatarJPA avatarRepository = this.entityManager.find(AvatarJPA.class, id);
 
         return sm.EntitytoDTO(avatarRepository);
     }
@@ -27,7 +27,7 @@ public class AvatarDao extends AbstractDao {
     public void addAvatar(Avatar avatar) {
         StudentMapper sm = new StudentMapper();
 
-        AvatarRepository avatarRepository = sm.DTOtoEntity(avatar);
+        AvatarJPA avatarRepository = sm.DTOtoEntity(avatar);
 
         this.create(avatarRepository);
     }

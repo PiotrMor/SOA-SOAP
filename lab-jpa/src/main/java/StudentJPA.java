@@ -1,13 +1,11 @@
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name="student")
-public class StudentRepository implements Serializable {
+public class StudentJPA implements Serializable {
     @Id
     @Column(name = "studentId")
     private int indexNumber;
@@ -19,10 +17,10 @@ public class StudentRepository implements Serializable {
     private String lastName;
 
     @Embedded
-    private AddressRepository address;
+    private AddressJPA address;
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
-    private AvatarRepository avatar;
+    private AvatarJPA avatar;
 
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(
@@ -30,14 +28,14 @@ public class StudentRepository implements Serializable {
             joinColumns = {@JoinColumn(name = "studentId")},
             inverseJoinColumns = {@JoinColumn(name = "course_id")}
     )
-    private Set<CourseRepository> courses = new HashSet<>();
+    private Set<CourseJPA> courses = new HashSet<>();
 
 
-    public StudentRepository() {
+    public StudentJPA() {
         super();
     }
 
-    public StudentRepository(String firstName, String lastName, AddressRepository address) {
+    public StudentJPA(String firstName, String lastName, AddressJPA address) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
@@ -67,19 +65,19 @@ public class StudentRepository implements Serializable {
         this.lastName = lastName;
     }
 
-    public AddressRepository getAddress() {
+    public AddressJPA getAddress() {
         return address;
     }
 
-    public void setAddress(AddressRepository address) {
+    public void setAddress(AddressJPA address) {
         this.address = address;
     }
 
-    public Set<CourseRepository> getCourses() {
+    public Set<CourseJPA> getCourses() {
         return courses;
     }
 
-    public void setCourses(Set<CourseRepository> courses) {
+    public void setCourses(Set<CourseJPA> courses) {
         this.courses = courses;
     }
 

@@ -4,10 +4,9 @@ import model.Student;
 import javax.ejb.Stateless;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.Metamodel;
-import java.security.acl.Owner;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @Stateless
@@ -19,13 +18,13 @@ public class StudentDao extends AbstractDao{
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Class<StudentRepository> getType() {
-        return StudentRepository.class;
+    protected Class<StudentJPA> getType() {
+        return StudentJPA.class;
     }
     public void add(Student student) {
         StudentMapper sm = new StudentMapper();
 
-        StudentRepository studentRepository = sm.DTOtoEntity(student);
+        StudentJPA studentRepository = sm.DTOtoEntity(student);
         getLogger().info(studentRepository.toString());
         this.create(studentRepository);
     }
@@ -33,7 +32,7 @@ public class StudentDao extends AbstractDao{
     public boolean update(int id, Student student) {
         StudentMapper sm = new StudentMapper();
 
-        StudentRepository studentRepository = sm.DTOtoEntity(student);
+        StudentJPA studentRepository = sm.DTOtoEntity(student);
 
         if (this.getOne(id) != null) {
             studentRepository.setIndexNumber(id);
@@ -56,15 +55,48 @@ public class StudentDao extends AbstractDao{
     public List<Student> getAll() {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-        CriteriaQuery<StudentRepository> q = cb.createQuery(StudentRepository.class);
-        Root<StudentRepository> c = q.from(StudentRepository.class);
+        CriteriaQuery<StudentJPA> q = cb.createQuery(StudentJPA.class);
+        Root<StudentJPA> c = q.from(StudentJPA.class);
         q.select(c);
 
-        TypedQuery<StudentRepository> query = entityManager.createQuery(q);
+        TypedQuery<StudentJPA> query = entityManager.createQuery(q);
 
-        List<StudentRepository> results = query.getResultList();
+        List<StudentJPA> results = query.getResultList();
 
         System.out.println(results);
+
+        StudentMapper sm = new StudentMapper();
+
+        return sm.EntitytoDTO(results);
+    }
+
+    public List<Student> getAll(Map<String, String> params) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+        CriteriaQuery<StudentJPA> q = cb.createQuery(StudentJPA.class);
+        Root<StudentJPA> c = q.from(StudentJPA.class);
+        Join<StudentJPA, CourseJPA> course = c.join("courses", JoinType.LEFT);
+        //Join<CourseJPA, LecturerJPA> lecturer = course.join("lecturer", JoinType.LEFT);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+
+        for (Map.Entry<String, String> param: params.entrySet()) {
+
+            if (param.getKey().contains("course")) {
+                predicates.add(cb.equal(course.get(getCorrectTableName(param.getKey())), param.getValue()));
+            } else {
+                predicates.add(cb.equal(c.get(param.getKey()), param.getValue() ));
+            }
+        }
+
+        getLogger().info("Mapa" + params);
+
+        q.select(c).where(predicates.toArray(new Predicate[]{}));
+
+
+
+        List<StudentJPA> results = entityManager.createQuery(q).getResultList();
 
         StudentMapper sm = new StudentMapper();
 
@@ -74,16 +106,17 @@ public class StudentDao extends AbstractDao{
     public List<Student> getAllByLastName(String lastName) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-        CriteriaQuery<StudentRepository> q = cb.createQuery(StudentRepository.class);
-        Root<StudentRepository> c = q.from(StudentRepository.class);
+        CriteriaQuery<StudentJPA> q = cb.createQuery(StudentJPA.class);
+        Root<StudentJPA> c = q.from(StudentJPA.class);
         ParameterExpression<String> p = cb.parameter(String.class);
+        getLogger().info("Parameter" + p);
 
         q.select(c).where(cb.equal(c.get("lastName"), p));
 
-        TypedQuery<StudentRepository> query = entityManager.createQuery(q);
+        TypedQuery<StudentJPA> query = entityManager.createQuery(q);
         query.setParameter(p, lastName);
 
-        List<StudentRepository> results = query.getResultList();
+        List<StudentJPA> results = query.getResultList();
 
         StudentMapper sm = new StudentMapper();
 
@@ -93,19 +126,19 @@ public class StudentDao extends AbstractDao{
     public List<Student> getAllByCourseName(String courseName) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-        CriteriaQuery<StudentRepository> q = cb.createQuery(StudentRepository.class);
-        Root<StudentRepository> c = q.from(StudentRepository.class);
+        CriteriaQuery<StudentJPA> q = cb.createQuery(StudentJPA.class);
+        Root<StudentJPA> c = q.from(StudentJPA.class);
         ParameterExpression<String> p = cb.parameter(String.class);
-        Join<StudentRepository, CourseRepository> course = c.join("courses", JoinType.LEFT);
+        Join<StudentJPA, CourseJPA> course = c.join("courses", JoinType.LEFT);
 
         Predicate predicate = cb.equal(course.get("name"), p);
 
         q.select(c).distinct(true).where(predicate);
 
-        TypedQuery<StudentRepository> query = entityManager.createQuery(q);
+        TypedQuery<StudentJPA> query = entityManager.createQuery(q);
         query.setParameter(p, courseName);
 
-        List<StudentRepository> results = query.getResultList();
+        List<StudentJPA> results = query.getResultList();
 
         StudentMapper sm = new StudentMapper();
 
@@ -115,7 +148,7 @@ public class StudentDao extends AbstractDao{
     public Student getOne(Integer id) {
         StudentMapper sm = new StudentMapper();
 
-        StudentRepository studentRepository = this.entityManager.find(StudentRepository.class, id);
+        StudentJPA studentRepository = this.entityManager.find(StudentJPA.class, id);
 
         return sm.EntitytoDTO(studentRepository);
     }
@@ -123,9 +156,16 @@ public class StudentDao extends AbstractDao{
     public void addAvatar(Avatar avatar) {
         StudentMapper sm = new StudentMapper();
 
-        AvatarRepository avatarRepository = sm.DTOtoEntity(avatar);
+        AvatarJPA avatarRepository = sm.DTOtoEntity(avatar);
 
         this.create(avatarRepository);
+    }
+
+    private String getCorrectTableName(String s) {
+        if (!s.contains("_")) {
+            return s;
+        }
+        return s.substring(s.indexOf("_") + 1);
     }
 
 }

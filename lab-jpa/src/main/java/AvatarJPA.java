@@ -3,7 +3,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "avatar")
-public class AvatarRepository implements Serializable {
+public class AvatarJPA implements Serializable {
     @Id
     @GeneratedValue
     @Column(name = "student_id")
@@ -14,7 +14,7 @@ public class AvatarRepository implements Serializable {
 
     @OneToOne()
     @MapsId
-    private StudentRepository student;
+    private StudentJPA student;
 
     public Integer getId() {
         return id;

@@ -7,11 +7,11 @@
    <persistence-unit name="SoaLabUnit">
       <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
       <jta-data-source>java:jboss/datasources/PostgresDS</jta-data-source>
-      <class>StudentRepository</class>
-      <class>CourseRepository</class>
-      <class>AddressRepository</class>
-      <class>LecturerRepository</class>
-      <class>AvatarRepository</class>
+      <class>StudentJPA</class>
+      <class>CourseJPA</class>
+      <class>AddressJPA</class>
+      <class>LecturerJPA</class>
+      <class>AvatarJPA</class>
       <properties>
          <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/postgresdb" />
          <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>

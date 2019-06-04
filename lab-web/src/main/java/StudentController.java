@@ -17,9 +17,7 @@ import javax.ws.rs.core.*;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Path("student")
@@ -44,18 +42,21 @@ public class StudentController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getStudentList(@QueryParam("lastName") String lastNameFilter,
-                                   @QueryParam("courseName") String courseNameFilter) {
+                                   @QueryParam("course_name") String courseNameFilter) {
         List<Student> students;
+        Map<String, String> params = new HashMap<>();
+
         if (courseNameFilter != null) {
-            System.out.println("courseFilter");
-            students = studentDao.getAllByCourseName(courseNameFilter);
-        } else if (lastNameFilter != null) {
-            System.out.println("lastNameFilter");
-            students = studentDao.getAllByLastName(lastNameFilter);
-        } else {
-            System.out.println("all");
-            students = studentDao.getAll();
+            params.put("lastName", lastNameFilter);
         }
+         if (lastNameFilter != null) {
+            params.put("course_name", courseNameFilter);
+        }
+         if (params.isEmpty()) {
+             students = studentDao.getAll();
+         } else {
+             students = studentDao.getAll(params);
+         }
         return Response.ok(students).status(Response.Status.OK).build();
     }
 

@@ -6,32 +6,32 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class StudentMapper {
-    public StudentRepository DTOtoEntity(Student student) {
+    public StudentJPA DTOtoEntity(Student student) {
         ModelMapper modelMapper = new ModelMapper();
-        return modelMapper.map(student, StudentRepository.class);
+        return modelMapper.map(student, StudentJPA.class);
     }
 
-    public Student EntitytoDTO(StudentRepository studentRepository) {
+    public Student EntitytoDTO(StudentJPA studentRepository) {
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(studentRepository, Student.class);
     }
 
-    public List<Student> EntitytoDTO(List<StudentRepository> studentRepositories) {
+    public List<Student> EntitytoDTO(List<StudentJPA> studentRepositories) {
         final ModelMapper modelMapper = new ModelMapper();
         return studentRepositories.stream().map(s -> modelMapper.map(s, Student.class)).collect(Collectors.toList());
     }
 
-    public List<StudentRepository> DTOtoEntity(List<Student> students) {
+    public List<StudentJPA> DTOtoEntity(List<Student> students) {
         final ModelMapper modelMapper = new ModelMapper();
-        return students.stream().map(s -> modelMapper.map(s, StudentRepository.class)).collect(Collectors.toList());
+        return students.stream().map(s -> modelMapper.map(s, StudentJPA.class)).collect(Collectors.toList());
     }
 
-    public AvatarRepository DTOtoEntity(Avatar student) {
+    public AvatarJPA DTOtoEntity(Avatar student) {
         ModelMapper modelMapper = new ModelMapper();
-        return modelMapper.map(student, AvatarRepository.class);
+        return modelMapper.map(student, AvatarJPA.class);
     }
 
-    public Avatar EntitytoDTO(AvatarRepository avatarRepository) {
+    public Avatar EntitytoDTO(AvatarJPA avatarRepository) {
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper.map(avatarRepository, Avatar.class);
     }

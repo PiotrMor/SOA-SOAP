@@ -3,11 +3,11 @@ import javax.persistence.Table;
 
 @Embeddable
 @Table(name = "address")
-public class AddressRepository {
+public class AddressJPA {
     private String street;
     private String city;
 
-    public AddressRepository() {
+    public AddressJPA() {
     }
 
     public String getStreet() {

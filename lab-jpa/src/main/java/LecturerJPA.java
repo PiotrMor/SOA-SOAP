@@ -4,7 +4,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "lecturer")
-public class LecturerRepository {
+public class LecturerJPA {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -13,10 +13,10 @@ public class LecturerRepository {
     private String name;
 
     @OneToMany(mappedBy = "lecturer")
-    private List<CourseRepository> courses = new ArrayList<>();
+    private List<CourseJPA> courses = new ArrayList<>();
 
 
-    public LecturerRepository() {
+    public LecturerJPA() {
     }
 
     public Integer getId() {
@@ -35,11 +35,11 @@ public class LecturerRepository {
         this.name = name;
     }
 
-    public List<CourseRepository> getCourses() {
+    public List<CourseJPA> getCourses() {
         return courses;
     }
 
-    public void setCourses(List<CourseRepository> courses) {
+    public void setCourses(List<CourseJPA> courses) {
         this.courses = courses;
     }
 }

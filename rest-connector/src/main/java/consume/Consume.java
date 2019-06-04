@@ -46,6 +46,10 @@ public class Consume {
         courses.add(new Course("c++", 5, new Lecturer("Fatyga")));
         System.out.println(addStudent(s3, jwtToken));
 
+        System.out.println("\n");
+        System.out.println(getCustomList());
+        System.out.println("\n");
+
         System.out.println("-----STUDENTS WITH COURSE c++-----");
         System.out.println(getStudentList("courseName", "c++"));
         System.out.println("-----STUDENTS WITH LASTNAME = Polak-----");
@@ -77,6 +81,18 @@ public class Consume {
 
 
 
+    }
+
+    private static List<Student> getCustomList() {
+        ResteasyClient client = new ResteasyClientBuilder().build();
+        ResteasyWebTarget target = client.target(URL);
+        Response response = target
+                .queryParam("lastName", "Morawiecki")
+                .request()
+                .get();
+        List<Student> students = response.readEntity(new GenericType<List<Student>>() {});
+        client.close();
+        return students;
     }
 
     private static Student getStudent(int id) {
