@@ -75,24 +75,27 @@ public class StudentDao extends AbstractDao{
 
         CriteriaQuery<StudentJPA> q = cb.createQuery(StudentJPA.class);
         Root<StudentJPA> c = q.from(StudentJPA.class);
+        Join<StudentJPA, AddressJPA> address = c.join("address", JoinType.LEFT);
         Join<StudentJPA, CourseJPA> course = c.join("courses", JoinType.LEFT);
-        //Join<CourseJPA, LecturerJPA> lecturer = course.join("lecturer", JoinType.LEFT);
+        Join<CourseJPA, LecturerJPA> lecturer = course.join("lecturer", JoinType.LEFT);
 
         List<Predicate> predicates = new ArrayList<>();
 
 
         for (Map.Entry<String, String> param: params.entrySet()) {
-
             if (param.getKey().contains("course")) {
                 predicates.add(cb.equal(course.get(getCorrectTableName(param.getKey())), param.getValue()));
+            } else if(param.getKey().contains("lecturer"))  {
+                predicates.add(cb.equal(lecturer.get(getCorrectTableName(param.getKey())), param.getValue()));
+            } else if(param.getKey().contains("address"))  {
+                predicates.add(cb.equal(address.get(getCorrectTableName(param.getKey())), param.getValue()));
             } else {
                 predicates.add(cb.equal(c.get(param.getKey()), param.getValue() ));
             }
         }
 
-        getLogger().info("Mapa" + params);
 
-        q.select(c).where(predicates.toArray(new Predicate[]{}));
+        q.select(c).distinct(true).where(predicates.toArray(new Predicate[]{}));
 
 
 

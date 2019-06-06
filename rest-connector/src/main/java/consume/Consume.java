@@ -11,14 +11,13 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Consume {
     private static final String URL = "http://localhost:8080/lab-web/student";
@@ -31,27 +30,48 @@ public class Consume {
 
         Address address = new Address("Budryka", "Krakow");
 
-        Student s1 = new Student(123123, "Karol", "Kowalski",address, courses);
-        Student s2 = new Student(213123, "Łukasz", "Polak",address, courses);
-        Student s3 = new Student(223123, "Łukasz", "Polak",address, courses);
+        Student s1 = new Student(123123, "Karol", "Kowalski",new Address("Budryka", "Krakow"), courses);
+        Student s2 = new Student(213123, "Kacper", "Polak",new Address("Opolska", "Warszawa"), courses);
+        Student s3 = new Student(223123, "Łukasz", "Polak",new Address("Budryka", "Warszawa"), courses);
+        Student s4 = new Student(225123, "Anna", "Wawer",new Address("Opolska", "Kielce"), courses);
 
         deleteStudent(123123, jwtToken);
         deleteStudent(213123, jwtToken);
         deleteStudent(223123, jwtToken);
-
-
-        System.out.println(addStudent(s1, jwtToken));
-
-        System.out.println(addStudent(s2, jwtToken));
+        addStudent(s1, jwtToken);
+        addStudent(s2, jwtToken);
         courses.add(new Course("c++", 5, new Lecturer("Fatyga")));
-        System.out.println(addStudent(s3, jwtToken));
+        addStudent(s3, jwtToken);
+        courses.add(new Course("psi", 2, new Lecturer("Kaminski")));
+        addStudent(s4, jwtToken);
+        printStudentList(getStudentList());
+        MultivaluedMap<String, Object> params = new MultivaluedHashMap<>();
+        System.out.println("\n");
+        params.putSingle("lastName", "Polak");
+        System.out.println("lastname = Polak");
+        printStudentList(getStudentList(params));
 
         System.out.println("\n");
+
+        System.out.println("city = Krakow, lecturer = Nowak");
+        params = new MultivaluedHashMap<>();
+        params.putSingle("address_city", "Krakow");
+        params.putSingle("lecturer_name", "Nowak");
+        printStudentList(getStudentList(params));
+
+
+
+
+
+        //System.out.println(getStudentList(params));
+
+
+        /*System.out.println("\n");
         System.out.println(getCustomList());
         System.out.println("\n");
 
         System.out.println("-----STUDENTS WITH COURSE c++-----");
-        System.out.println(getStudentList("courseName", "c++"));
+        System.out.println(getStudentList("course_name", "java"));
         System.out.println("-----STUDENTS WITH LASTNAME = Polak-----");
         System.out.println(getStudentList("lastName","Polak"));
         System.out.println("-----ALL STUDENTS-----");
@@ -66,7 +86,7 @@ public class Consume {
         updateStudent(s2, jwtToken);
         System.out.println("-----UPDATE STUDENT WITH ID 213123");
         System.out.println(getStudent(s2.getIndexNumber()));
-
+*/
 
 
         /*s1.setLastName("Nowak");
@@ -83,17 +103,7 @@ public class Consume {
 
     }
 
-    private static List<Student> getCustomList() {
-        ResteasyClient client = new ResteasyClientBuilder().build();
-        ResteasyWebTarget target = client.target(URL);
-        Response response = target
-                .queryParam("lastName", "Morawiecki")
-                .request()
-                .get();
-        List<Student> students = response.readEntity(new GenericType<List<Student>>() {});
-        client.close();
-        return students;
-    }
+
 
     private static Student getStudent(int id) {
         ResteasyClient client = new ResteasyClientBuilder().build();
@@ -108,11 +118,11 @@ public class Consume {
         return student;
     }
 
-    private static List<Student> getStudentList(String query, String value) {
+    private static List<Student> getStudentList(MultivaluedMap<String, Object> params) {
         ResteasyClient client = new ResteasyClientBuilder().build();
         ResteasyWebTarget target = client.target(URL);
         Response response = target
-                .queryParam(query, value)
+                .queryParams(params)
                 .request()
                 .get();
         List<Student> students = response.readEntity(new GenericType<List<Student>>() {});
@@ -211,5 +221,12 @@ public class Consume {
             e.printStackTrace();
         }
         return "Error";
+    }
+
+    private static void printStudentList(List<Student> students) {
+
+        for (Student student: students) {
+            System.out.println(student);
+        }
     }
 }

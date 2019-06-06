@@ -9,6 +9,7 @@ import model.Student;
 import model.StudentContainer;
 import model.StudentProto;
 import utils.Base64Utils;
+
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -42,21 +43,44 @@ public class StudentController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getStudentList(@QueryParam("lastName") String lastNameFilter,
-                                   @QueryParam("course_name") String courseNameFilter) {
+                                   @QueryParam("firstName") String firstNameFilter,
+                                   @QueryParam("address_street") String streetFiler,
+                                   @QueryParam("address_city") String cityFilter,
+                                   @QueryParam("course_name") String courseNameFilter,
+                                   @QueryParam("course_ects") String courseEctsFilter,
+                                   @QueryParam("lecturer_name") String lecturerNameFilter) {
         List<Student> students;
         Map<String, String> params = new HashMap<>();
 
-        if (courseNameFilter != null) {
+        if (lastNameFilter != null) {
             params.put("lastName", lastNameFilter);
         }
-         if (lastNameFilter != null) {
+        if (streetFiler != null) {
+            params.put("address_street", streetFiler);
+        }
+        if (firstNameFilter != null) {
+            params.put("firstName", firstNameFilter);
+        }
+        if (cityFilter != null) {
+            params.put("address_city", cityFilter);
+        }
+        if (courseNameFilter != null) {
             params.put("course_name", courseNameFilter);
         }
-         if (params.isEmpty()) {
-             students = studentDao.getAll();
-         } else {
-             students = studentDao.getAll(params);
-         }
+        if (courseEctsFilter != null) {
+            params.put("course_ects", courseEctsFilter);
+        }
+        if (lecturerNameFilter != null) {
+            params.put("lecturer_name", lecturerNameFilter);
+        }
+
+
+
+        if (params.isEmpty()) {
+            students = studentDao.getAll();
+        } else {
+            students = studentDao.getAll(params);
+        }
         return Response.ok(students).status(Response.Status.OK).build();
     }
 
